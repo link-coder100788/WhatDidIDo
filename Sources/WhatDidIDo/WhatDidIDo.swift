@@ -373,6 +373,6 @@ struct Version: ParsableCommand {
 	)
 
 	func run() {
-		print("whatdidido 1.2.0")
+		print("whatdidido 1.2.1")
 	}
 }

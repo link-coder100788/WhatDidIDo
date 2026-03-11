@@ -185,14 +185,9 @@ struct HistoryParser {
 
 	/// "What did I just do?" — commands since the last clear/exit, or last N
 	func recent(_ count: Int = 20) -> [String] {
-		let sessionBreakers = ["clear", "exit", "reset", "logout"]
-		let session: [String]
-		if let lastBreak = history.content.lastIndex(where: { sessionBreakers.contains($0.lowercased()) }) {
-			session = Array(history.content.suffix(from: lastBreak + 1))
-		} else {
-			session = history.content
-		}
-		let slice = Array(session.suffix(count))
+		let sessionBreakers: Set<String> = ["clear", "exit", "reset", "logout"]
+		let filtered = history.content.filter { !sessionBreakers.contains($0.lowercased()) }
+		let slice = Array(filtered.suffix(count))
 		let base = max(0, history.content.count - slice.count)
 		return numbered(slice, startingAt: base)
 	}

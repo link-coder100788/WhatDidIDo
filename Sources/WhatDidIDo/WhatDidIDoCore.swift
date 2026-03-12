@@ -319,7 +319,6 @@ enum VersionError: Error, CustomStringConvertible {
 // MARK: - Version Logic
 
 struct VersionChecker {
-
 	static func isNewerVersion(_ latest: String, than current: String) -> Bool {
 		let clean = { (v: String) in
 			v.trimmingCharacters(in: .init(charactersIn: "v"))

@@ -336,6 +336,7 @@ struct ConfigShow: ParsableCommand {
 		let cfg = WhatDidIDoConfig.shared
 		print("color: \(cfg.shouldColor)")
 		print("path: \(cfg.customPath?.path ?? "(default — auto-detected from shell)")")
+		print("updateReminders: \(cfg.updateAvailableWarning)")
 	}
 }
 

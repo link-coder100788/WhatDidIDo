@@ -126,18 +126,21 @@ struct WhatDidIDoConfig {
 	var customPath: URL? = nil
 	var shouldColor: Bool = true
 	var updateAvailableWarning: Bool = true
+	var lastUpdateCheck: Date? = nil
 }
 
 struct WhatDidIDoConfigCodable: Encodable, Decodable {
 	var customPath: URL?
 	var shouldColor: Bool
 	var updateAvailableWarning: Bool
+	var lastUpdateCheck: Date?
 
 	static func from(config: WhatDidIDoConfig) -> WhatDidIDoConfigCodable {
 		return WhatDidIDoConfigCodable(
 			customPath: config.customPath,
 			shouldColor: config.shouldColor,
-			updateAvailableWarning: config.updateAvailableWarning
+			updateAvailableWarning: config.updateAvailableWarning,
+			lastUpdateCheck: config.lastUpdateCheck
 		)
 	}
 }
@@ -168,6 +171,7 @@ struct WhatDidIDoConfigCore {
 		WhatDidIDoConfig.shared.customPath = decoded.customPath
 		WhatDidIDoConfig.shared.shouldColor = decoded.shouldColor
 		WhatDidIDoConfig.shared.updateAvailableWarning = decoded.updateAvailableWarning
+		WhatDidIDoConfig.shared.lastUpdateCheck = decoded.lastUpdateCheck
 	}
 }
 
@@ -380,28 +384,33 @@ struct VersionChecker {
 }
 
 func embeddedUpdateCheck() {
-	if WhatDidIDoConfig.shared.updateAvailableWarning {
-		if #available(macOS 12.0, *) {
-			let sema = DispatchSemaphore(value: 0)
-			
-			Task {
-				defer { sema.signal() }
-				do {
-					let result = try await VersionChecker.checkForUpdate(
-						owner: Info.owner,
-						repo: Info.repo,
-						currentVersion: Info.currentVersion
-					)
-					
-					if result.updateAvailable {
-						print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
-					}
-				} catch {
-					
+	guard WhatDidIDoConfig.shared.updateAvailableWarning else { return }
+
+	let checkInterval: TimeInterval = 60 * 60 * 24
+	if let last = WhatDidIDoConfig.shared.lastUpdateCheck,
+	   Date().timeIntervalSince(last) < checkInterval {
+		return
+	}
+
+	if #available(macOS 12.0, *) {
+		let sema = DispatchSemaphore(value: 0)
+		Task {
+			defer { sema.signal() }
+			do {
+				let result = try await VersionChecker.checkForUpdate(
+					owner: Info.owner,
+					repo: Info.repo,
+					currentVersion: Info.currentVersion
+				)
+				if result.updateAvailable {
+					print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
+					print("Disable these warnings with: whatdidido config --set updateWarn false")
 				}
-			}
-			
-			sema.wait()
+				
+				WhatDidIDoConfig.shared.lastUpdateCheck = Date()
+				WhatDidIDoConfigCore().save()
+			} catch { }
 		}
+		sema.wait()
 	}
 }

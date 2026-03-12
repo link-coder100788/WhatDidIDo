@@ -3,7 +3,7 @@ import Foundation
 enum Info {
 	static let owner = "link-coder100788"
 	static let repo = "WhatDidIDo"
-	static let currentVersion = "1.2.4"
+	static let currentVersion = "1.2.5"
 }
 
 enum Shell {
@@ -125,14 +125,20 @@ struct WhatDidIDoConfig {
 
 	var customPath: URL? = nil
 	var shouldColor: Bool = true
+	var updateAvailableWarning: Bool = true
 }
 
 struct WhatDidIDoConfigCodable: Encodable, Decodable {
 	var customPath: URL?
 	var shouldColor: Bool
+	var updateAvailableWarning: Bool
 
 	static func from(config: WhatDidIDoConfig) -> WhatDidIDoConfigCodable {
-		return WhatDidIDoConfigCodable(customPath: config.customPath, shouldColor: config.shouldColor)
+		return WhatDidIDoConfigCodable(
+			customPath: config.customPath,
+			shouldColor: config.shouldColor,
+			updateAvailableWarning: config.updateAvailableWarning
+		)
 	}
 }
 
@@ -161,6 +167,7 @@ struct WhatDidIDoConfigCore {
 
 		WhatDidIDoConfig.shared.customPath = decoded.customPath
 		WhatDidIDoConfig.shared.shouldColor = decoded.shouldColor
+		WhatDidIDoConfig.shared.updateAvailableWarning = decoded.updateAvailableWarning
 	}
 }
 
@@ -370,5 +377,32 @@ struct VersionChecker {
 			latestVersion: latest,
 			updateAvailable: isNewerVersion(latest, than: currentVersion)
 		)
+	}
+}
+
+func embeddedUpdateCheck() {
+	if WhatDidIDoConfig.shared.updateAvailableWarning {
+		if #available(macOS 12.0, *) {
+			let sema = DispatchSemaphore(value: 0)
+			
+			Task {
+				defer { sema.signal() }
+				do {
+					let result = try await VersionChecker.checkForUpdate(
+						owner: Info.owner,
+						repo: Info.repo,
+						currentVersion: Info.currentVersion
+					)
+					
+					if result.updateAvailable {
+						print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
+					}
+				} catch {
+					
+				}
+			}
+			
+			sema.wait()
+		}
 	}
 }

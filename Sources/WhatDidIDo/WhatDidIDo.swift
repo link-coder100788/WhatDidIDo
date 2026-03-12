@@ -104,6 +104,8 @@ struct Recent: ParsableCommand {
 	var count: Int = 20
 
 	func run() throws {
+		embeddedUpdateCheck()
+		
 		let history = try loadHistory(options: shellOpts)
 		let lines = HistoryParser(history: history).recent(count)
 		printLines(lines)
@@ -293,6 +295,9 @@ struct ConfigSet: ParsableCommand {
 
 	@Option(name: .long, help: "Enable or disable color output (true/false).")
 	var color: Bool?
+	
+	@Option(name: .long, help: "Enable warnings regarding if there is an available update.")
+	var updateWarn: Bool?
 
 	func run() throws {
 		WhatDidIDoConfigCore().load()
@@ -306,8 +311,12 @@ struct ConfigSet: ParsableCommand {
 			WhatDidIDoConfig.shared.shouldColor = color
 			print("✔ Color output set to: \(color)")
 		}
+		
+		if let updateWarn = updateWarn {
+			WhatDidIDoConfig.shared.updateAvailableWarning = updateWarn
+		}
 
-		if path == nil && color == nil {
+		if path == nil && color == nil && updateWarn == nil {
 			print("Nothing to set. Use --path or --color.")
 			return
 		}
@@ -385,24 +394,33 @@ struct CheckUpdate: ParsableCommand {
 		commandName: "check-update",
 		abstract: "Check if a newer version is available on GitHub."
 	)
-	
+
 	mutating func run() throws {
 		if #available(macOS 12.0, *) {
+			let sema = DispatchSemaphore(value: 0)
+			
 			Task {
-				let result = try await VersionChecker.checkForUpdate(
-					owner: Info.owner,
-					repo: Info.repo,
-					currentVersion: Info.currentVersion
-				)
-
-				if result.updateAvailable {
-					print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
-				} else {
-					print("Up to date: \(result.currentVersion)")
+				defer { sema.signal() }
+				do {
+					let result = try await VersionChecker.checkForUpdate(
+						owner: Info.owner,
+						repo: Info.repo,
+						currentVersion: Info.currentVersion
+					)
+					
+					if result.updateAvailable {
+						print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
+					} else {
+						print("Up to date: \(result.currentVersion)")
+					}
+				} catch {
+					print("Error checking for update: \(error)")
 				}
 			}
+			
+			sema.wait()
 		} else {
-			print("This feature only supported on macOS 12.0 or newer!")
+			print("check-update requires macOS 12.0 or newer.")
 		}
 	}
 }

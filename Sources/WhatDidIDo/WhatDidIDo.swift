@@ -380,45 +380,26 @@ struct Version: ParsableCommand {
 
 // MARK: - Latest
 
-struct CheckUpdate: AsyncParsableCommand {
+struct CheckUpdate: ParsableCommand {
 	static let configuration = CommandConfiguration(
 		commandName: "check-update",
 		abstract: "Check if a newer version is available on GitHub."
 	)
-
-	@Argument(help: "GitHub repository owner (e.g. 'apple')")
-	var owner: String
-
-	@Argument(help: "GitHub repository name (e.g. 'swift')")
-	var repo: String
-
-	@Argument(help: "Current version to compare against (e.g. '1.0.0')")
-	var currentVersion: String
-
-	@Option(name: .shortAndLong, help: "GitHub personal access token (optional, increases rate limit)")
-	var token: String?
-
-	@Flag(name: .shortAndLong, help: "Only print the latest version string and exit")
-	var quiet: Bool = false
-
-	mutating func run() async throws {
+	
+	mutating func run() throws {
 		if #available(macOS 12.0, *) {
-			let result = try await VersionChecker.checkForUpdate(
-				owner: owner,
-				repo: repo,
-				currentVersion: currentVersion,
-				token: token
-			)
+			Task {
+				let result = try await VersionChecker.checkForUpdate(
+					owner: Info.owner,
+					repo: Info.repo,
+					currentVersion: Info.currentVersion
+				)
 
-			if quiet {
-				print(result.latestVersion)
-				return
-			}
-
-			if result.updateAvailable {
-				print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
-			} else {
-				print("Up to date: \(result.currentVersion)")
+				if result.updateAvailable {
+					print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
+				} else {
+					print("Up to date: \(result.currentVersion)")
+				}
 			}
 		} else {
 			print("This feature only supported on macOS 12.0 or newer!")

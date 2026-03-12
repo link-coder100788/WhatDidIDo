@@ -314,10 +314,11 @@ struct ConfigSet: ParsableCommand {
 		
 		if let updateWarn = updateWarn {
 			WhatDidIDoConfig.shared.updateAvailableWarning = updateWarn
+			print("✔ Update warning set to: \(updateWarn)")
 		}
 
 		if path == nil && color == nil && updateWarn == nil {
-			print("Nothing to set. Use --path or --color.")
+			print("Nothing to set. Use --path, --color, or --updateWarn")
 			return
 		}
 

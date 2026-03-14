@@ -3,7 +3,7 @@ import Foundation
 enum Info {
 	static let owner = "link-coder100788"
 	static let repo = "WhatDidIDo"
-	static let currentVersion = "1.2.7"
+	static let currentVersion = "1.2.8"
 }
 
 enum Shell {
@@ -175,32 +175,37 @@ struct WhatDidIDoConfigCore {
 	}
 }
 
-struct HistoryParser {
-	let history: History
+// MARK: - Color Helpers
 
-	// MARK: - Color Helpers
-
+struct TerminalColor {
 	private func color(_ code: String) -> String {
 		return WhatDidIDoConfig.shared.shouldColor ? code : ""
 	}
+	
+	var red: String    { color("\u{001B}[31m") }
+	var green: String  { color("\u{001B}[32m") }
+	var cyan: String   { color("\u{001B}[36m") }
+	var yellow: String { color("\u{001B}[33m") }
+	var blue: String   { color("\u{001B}[34m") }
+	var bold: String   { color("\u{001B}[1m") }
+	var dim: String    { color("\u{001B}[2m") }
+	var reset: String  { color("\u{001B}[0m") }
+}
 
-	private var green: String  { color("\u{001B}[32m") }
-	private var cyan: String   { color("\u{001B}[36m") }
-	private var yellow: String { color("\u{001B}[33m") }
-	private var blue: String   { color("\u{001B}[34m") }
-	private var bold: String   { color("\u{001B}[1m") }
-	private var dim: String    { color("\u{001B}[2m") }
-	private var reset: String  { color("\u{001B}[0m") }
+struct HistoryParser {
+	let history: History
+	
+	let color = TerminalColor()
 
 	private func numbered(_ lines: [String], startingAt offset: Int = 0) -> [String] {
 		lines.enumerated().map { i, line in
-			"\(dim)\(String(format: "%4d", i + 1 + offset))\(reset)  \(line)"
+			"\(color.dim)\(String(format: "%4d", i + 1 + offset))\(color.reset)  \(line)"
 		}
 	}
 
 	// MARK: - Daily Drivers
 
-	/// "What did I just do?" — commands since the last clear/exit, or last N
+	/// "What did I just do?"  commands since the last clear/exit, or last N
 	func recent(_ count: Int = 20) -> [String] {
 		let sessionBreakers: Set<String> = ["clear", "exit", "reset", "logout"]
 		let filtered = history.content.filter { !sessionBreakers.contains($0.lowercased()) }
@@ -209,7 +214,7 @@ struct HistoryParser {
 		return numbered(slice, startingAt: base)
 	}
 
-	/// "Where was I working?" — most recently visited directories
+	/// "Where was I working?"  most recently visited directories
 	func recentDirectories(limit: Int = 10) -> [String] {
 		let cdPattern = #"^cd\s+"#
 		let dirs = history.content
@@ -217,10 +222,10 @@ struct HistoryParser {
 			.map { $0.replacingOccurrences(of: #"^cd\s+"#, with: "", options: .regularExpression) }
 		var seen = Set<String>()
 		let unique = dirs.reversed().filter { seen.insert($0).inserted }.reversed()
-		return Array(unique.suffix(limit)).map { "\(cyan)cd\(reset) \($0)" }
+		return Array(unique.suffix(limit)).map { "\(color.cyan)cd\(color.reset) \($0)" }
 	}
 
-	/// "What commands do I use most?" — ranked frequency table
+	/// "What commands do I use most?"  ranked frequency table
 	func mostUsed(top n: Int = 10) -> [String] {
 		var freq: [String: Int] = [:]
 		for cmd in history.content {
@@ -231,24 +236,24 @@ struct HistoryParser {
 		let maxCount = sorted.first?.value ?? 1
 		return sorted.enumerated().map { i, pair in
 			let bar = String(repeating: "▪", count: max(1, pair.value * 20 / maxCount))
-			return "\(bold)\(String(format: "%2d", i + 1))\(reset)  \(yellow)\(bar)\(reset)  \(pair.key) \(dim)(\(pair.value)x)\(reset)"
+			return "\(color.bold)\(String(format: "%2d", i + 1))\(color.reset)  \(color.yellow)\(bar)\(color.reset)  \(pair.key) \(color.dim)(\(pair.value)x)\(color.reset)"
 		}
 	}
 
-	/// "Did I already do this?" — search with highlighted matches
+	/// "Did I already do this?"  search with highlighted matches
 	func search(_ query: String) -> [String] {
 		let matches = history.content.enumerated().filter {
 			$0.element.localizedCaseInsensitiveContains(query)
 		}
 		return matches.map { i, line in
 			let highlighted = WhatDidIDoConfig.shared.shouldColor
-				? line.replacingOccurrences(of: query, with: "\(bold)\(green)\(query)\(reset)", options: .caseInsensitive)
+			? line.replacingOccurrences(of: query, with: "\(color.bold)\(color.green)\(query)\(color.reset)", options: .caseInsensitive)
 				: line
-			return "\(dim)\(String(format: "%4d", i + 1))\(reset)  \(highlighted)"
+			return "\(color.dim)\(String(format: "%4d", i + 1))\(color.reset)  \(highlighted)"
 		}
 	}
 
-	/// "How do I do X again?" — find commands matching a tool/prefix (e.g. "git", "docker")
+	/// "How do I do X again?"  find commands matching a tool/prefix (e.g. "git", "docker")
 	func commandsFor(_ tool: String, limit: Int = 20) -> [String] {
 		let prefix = tool.lowercased()
 		let matches = history.content.enumerated().filter {
@@ -256,21 +261,21 @@ struct HistoryParser {
 			return base == prefix
 		}
 		return Array(matches.suffix(limit)).map { i, line in
-			"\(dim)\(String(format: "%4d", i + 1))\(reset)  \(cyan)\(line)\(reset)"
+			"\(color.dim)\(String(format: "%4d", i + 1))\(color.reset)  \(color.cyan)\(line)\(color.reset)"
 		}
 	}
 
-	/// "What was I doing around a certain time?" — last N unique base commands as a readable summary
+	/// "What was I doing around a certain time?"  last N unique base commands as a readable summary
 	func summary(last count: Int = 50) -> [String] {
 		var seen = Set<String>()
 		let unique = history.content.suffix(count).filter { line in
 			let base = line.components(separatedBy: .whitespaces).first ?? line
 			return seen.insert(base).inserted
 		}
-		return unique.map { "\(blue)▸\(reset) \($0)" }
+		return unique.map { "\(color.blue)▸\(color.reset) \($0)" }
 	}
 
-	/// "Did I ever run this exact thing before?" — check for an exact or prefix match.
+	/// "Did I ever run this exact thing before?" check for an exact or prefix match.
 	/// Note: always excludes the very last history entry, which is typically the `whatdidido` invocation itself.
 	func hasPreviouslyRun(_ command: String, exact: Bool = false) -> Bool {
 		if exact {
@@ -283,14 +288,14 @@ struct HistoryParser {
 		}
 	}
 
-	/// "What did I run after X?" — commands following a match, useful for workflow recall
+	/// "What did I run after X?"  commands following a match, useful for workflow recall
 	func commandsAfter(_ query: String, window: Int = 5) -> [String] {
 		guard let idx = history.content.lastIndex(where: {
 			$0.localizedCaseInsensitiveContains(query)
 		}) else { return [] }
 		let start = history.content.index(after: idx)
 		let end = min(history.content.index(start, offsetBy: window), history.content.endIndex)
-		return Array(history.content[start..<end]).map { "\(blue)▸\(reset) \($0)" }
+		return Array(history.content[start..<end]).map { "\(color.blue)▸\(color.reset) \($0)" }
 	}
 }
 
@@ -347,10 +352,13 @@ struct VersionChecker {
 		var request = URLRequest(url: url)
 		request.setValue("application/vnd.github+json", forHTTPHeaderField: "Accept")
 		request.setValue("2022-11-28", forHTTPHeaderField: "X-GitHub-Api-Version")
-		if let token { request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization") }
+		if let token {
+			request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+		}
 
 		let data: Data
 		let response: URLResponse
+		
 		do {
 			(data, response) = try await URLSession.shared.data(for: request)
 		} catch let urlError as URLError {
@@ -365,10 +373,12 @@ struct VersionChecker {
 			let code = (response as? HTTPURLResponse)?.statusCode ?? -1
 			throw VersionError.networkError(statusCode: code)
 		}
+		
 		guard let json = try JSONSerialization.jsonObject(with: data) as? [String: Any],
 			  let tag = json["tag_name"] as? String else {
 			throw VersionError.parseError
 		}
+		
 		return tag
 	}
 

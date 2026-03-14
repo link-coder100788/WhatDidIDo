@@ -2,6 +2,8 @@
 
 A pretty wrapper for your shell history. Answers the questions you actually ask yourself at the terminal.
 
+![whatdidido top command](./images/top.png)
+
 ```
 whatdidido recent
 whatdidido top
@@ -17,6 +19,33 @@ whatdidido for git
 - Swift 5.9+
 - [swift-argument-parser](https://github.com/apple/swift-argument-parser) 1.3.0+
 
+### Make (recommended)
+
+```bash
+git clone https://github.com/link-coder100788/WhatDidIDo
+cd WhatDidIDo
+make install
+```
+
+To install to a different prefix (e.g. `~/.local`):
+
+```bash
+make install PREFIX=~/.local
+```
+
+To uninstall:
+
+```bash
+make uninstall
+```
+
+### Manual (Swift Package Manager)
+
+```bash
+swift build -c release
+cp .build/release/whatdidido /usr/local/bin/whatdidido
+```
+
 ### Package.swift
 
 ```swift
@@ -28,13 +57,6 @@ targets: [
         .product(name: "ArgumentParser", package: "swift-argument-parser")
     ])
 ]
-```
-
-### Build & Install
-
-```bash
-swift build -c release
-cp .build/release/whatdidido /usr/local/bin/whatdidido
 ```
 
 ---
@@ -53,6 +75,10 @@ Shell and OS are **auto-detected** from your environment — you rarely need to 
 ---
 
 ## Commands
+
+<!-- 📸 SCREENSHOT: `whatdidido --help` or a composite showing 2–3 commands side by side.
+     Good as a quick reference image here, just above the command table.
+     Keep it tighter than the hero shot — ~860×300px works well. -->
 
 ### `recent` — What did I just do?
 
@@ -241,6 +267,20 @@ whatdidido config set --path /Volumes/external/.zsh_history
 ```
 
 Or pass it per-command with a symlink if you juggle multiple profiles.
+
+---
+
+## Make targets
+
+| Target | Description |
+|---|---|
+| `make` / `make build` | Debug build |
+| `make release` | Optimised release build |
+| `make install` | Release build + install to `/usr/local/bin` |
+| `make install PREFIX=~/.local` | Install to a custom prefix |
+| `make uninstall` | Remove the installed binary |
+| `make clean` | Clean build artefacts |
+| `make test` | Run the test suite |
 
 ---
 

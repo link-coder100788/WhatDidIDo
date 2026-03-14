@@ -416,13 +416,13 @@ struct CheckUpdate: ParsableCommand {
 						print("Up to date: \(result.currentVersion)")
 					}
 				} catch {
-					print("\(TerminalColor().red) Error checking for update: \(error) \(TerminalColor().reset)")
+					print("\(TerminalColor().red)Error checking for update: \(error) \(TerminalColor().reset)")
 				}
 			}
 			
 			sema.wait()
 		} else {
-			print("\(TerminalColor().red) check-update requires macOS 12.0 or newer. \(TerminalColor().reset)")
+			print("\(TerminalColor().red)check-update requires macOS 12.0 or newer. \(TerminalColor().reset)")
 		}
 	}
 }

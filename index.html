@@ -792,7 +792,7 @@
       <span style="color: var(--amber)"> main</span>
     </div>
 
-    <h1>what<em>did</em>ido<span class="version-badge">v1.2.4</span></h1>
+    <h1>what<em>did</em>ido<span class="version-badge">v1.3.0</span></h1>
 
     <p class="tagline">
       A <strong>pretty wrapper</strong> for your shell history.<br>
@@ -959,7 +959,7 @@
       <div class="section-label">Installation</div>
       <h2>Up in<br><span class="accent">two commands.</span></h2>
       <p>
-        Requires Swift 5.9 or later. Build from source using the Swift Package Manager — no Homebrew formula needed, no dependencies beyond the argument parser.
+        Requires Swift 6.2 or later. Build from source using the Swift Package Manager — no Homebrew formula needed, no dependencies beyond the argument parser.
       </p>
       <p>
         Shell and OS are auto-detected from your environment — you rarely need to pass <code style="color:var(--amber)">--shell</code> or <code style="color:var(--amber)">--os</code> manually.
@@ -1007,17 +1007,41 @@
       <div class="code-block" style="margin-bottom:16px;">
         <div class="code-block-header">
           <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
-          <span>Build &amp; Install</span>
+          <span>Make (recommended)</span>
           <span style="opacity:0">x</span>
         </div>
-        <pre><span class="c-dim"># Clone the repo</span>
-<span class="c-green">git</span> clone https://github.com/link-coder100788/WhatDidIDo
-<span class="c-green">cd</span> whatdidido
+        <pre><span class="c-green">git</span> clone https://github.com/link-coder100788/WhatDidIDo
+<span class="c-green">cd</span> WhatDidIDo
+<span class="c-green">make</span> install
 
-<span class="c-dim"># Build release binary</span>
-<span class="c-green">swift</span> build -c release
+<span class="c-dim"># Custom install prefix</span>
+<span class="c-green">make</span> install <span class="c-amber">PREFIX</span>=~/.local
 
-<span class="c-dim"># Install to PATH</span>
+<span class="c-dim"># Uninstall</span>
+<span class="c-green">make</span> uninstall</pre>
+      </div>
+
+      <div class="code-block" style="margin-bottom:16px;">
+        <div class="code-block-header">
+          <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <span>Make targets</span>
+          <span style="opacity:0">x</span>
+        </div>
+        <pre><span class="c-dim">make</span> / <span class="c-green">make build</span>      <span class="c-dim">Debug build</span>
+<span class="c-green">make release</span>          <span class="c-dim">Optimised release build</span>
+<span class="c-green">make install</span>          <span class="c-dim">Release build + install to /usr/local/bin</span>
+<span class="c-green">make uninstall</span>        <span class="c-dim">Remove the installed binary</span>
+<span class="c-green">make clean</span>            <span class="c-dim">Clean build artefacts</span>
+<span class="c-green">make test</span>             <span class="c-dim">Run the test suite</span></pre>
+      </div>
+
+      <div class="code-block" style="margin-bottom:16px;">
+        <div class="code-block-header">
+          <div class="dots"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+          <span>Manual (Swift Package Manager)</span>
+          <span style="opacity:0">x</span>
+        </div>
+        <pre><span class="c-green">swift</span> build -c release
 <span class="c-green">cp</span> .build/release/whatdidido /usr/local/bin/</pre>
       </div>
 
@@ -1043,7 +1067,7 @@
           <span style="opacity:0">x</span>
         </div>
         <pre><span class="c-green">whatdidido</span> version
-<span class="c-dim">whatdidido 1.2.4</span>
+<span class="c-dim">whatdidido 1.3.0</span>
 
 <span class="c-green">whatdidido</span> debug
 <span class="c-dim">shell:   zsh
@@ -1135,7 +1159,7 @@ color:   true</span></pre>
 <footer>
   <div class="footer-brand">whatdidido</div>
   <div class="footer-meta">
-    v1.2.4 &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; Copyright 2026.
+    v1.3.0 &nbsp;·&nbsp; MIT License &nbsp;·&nbsp; Copyright 2026.
   </div>
   <div class="footer-links">
     <a href="#commands">Commands</a>

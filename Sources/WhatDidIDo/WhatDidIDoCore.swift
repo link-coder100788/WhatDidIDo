@@ -448,6 +448,7 @@ func embeddedUpdateCheck() {
 					repo: Info.repo,
 					currentVersion: Info.currentVersion
 				)
+				
 				if result.updateAvailable {
 					print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
 					print("Disable these warnings with: whatdidido config --set updateWarn false")

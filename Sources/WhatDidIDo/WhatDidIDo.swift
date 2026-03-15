@@ -104,9 +104,10 @@ struct Recent: ParsableCommand {
 	var count: Int = 20
 
 	func run() throws {
+		let history = try loadHistory(options: shellOpts)
+		
 		embeddedUpdateCheck()
 		
-		let history = try loadHistory(options: shellOpts)
 		let lines = HistoryParser(history: history).recent(count)
 		printLines(lines)
 	}

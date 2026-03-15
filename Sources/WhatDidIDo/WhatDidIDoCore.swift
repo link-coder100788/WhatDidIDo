@@ -3,7 +3,7 @@ import Foundation
 enum Info {
 	static let owner = "link-coder100788"
 	static let repo = "WhatDidIDo"
-	static let currentVersion = "1.3.1"
+	static let currentVersion = "1.3.2"
 }
 
 enum Shell {
@@ -429,35 +429,31 @@ struct VersionChecker {
 	}
 }
 
-func embeddedUpdateCheck() {
+func embeddedUpdateCheck() async {
 	guard WhatDidIDoConfig.shared.updateAvailableWarning else { return }
 
 	let checkInterval: TimeInterval = 60 * 60 * 24
+	
 	if let last = WhatDidIDoConfig.shared.lastUpdateCheck,
 	   Date().timeIntervalSince(last) < checkInterval {
 		return
 	}
 
 	if #available(macOS 12.0, *) {
-		let sema = DispatchSemaphore(value: 0)
-		Task {
-			defer { sema.signal() }
-			do {
-				let result = try await VersionChecker.checkForUpdate(
-					owner: Info.owner,
-					repo: Info.repo,
-					currentVersion: Info.currentVersion
-				)
-				
-				if result.updateAvailable {
-					print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
-					print("Disable these warnings with: whatdidido config --set updateWarn false")
-				}
-				
-				WhatDidIDoConfig.shared.lastUpdateCheck = Date()
-				WhatDidIDoConfigCore().save()
-			} catch { }
-		}
-		sema.wait()
+		do {
+			let result = try await VersionChecker.checkForUpdate(
+				owner: Info.owner,
+				repo: Info.repo,
+				currentVersion: Info.currentVersion
+			)
+			
+			if result.updateAvailable {
+				print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
+				print("Disable these warnings with: whatdidido config --set updateWarn false")
+			}
+			
+			WhatDidIDoConfig.shared.lastUpdateCheck = Date()
+			WhatDidIDoConfigCore().save()
+		} catch { }
 	}
 }

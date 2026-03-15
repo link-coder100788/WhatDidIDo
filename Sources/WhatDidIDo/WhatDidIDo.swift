@@ -4,7 +4,7 @@ import Foundation
 // MARK: - Root Command
 
 @main
-struct WhatDidIDo: ParsableCommand {
+struct WhatDidIDo: AsyncParsableCommand {
 	static let configuration = CommandConfiguration(
 		commandName: "whatdidido",
 		abstract: "A pretty wrapper for your shell history.",
@@ -93,7 +93,7 @@ func printLines(_ lines: [String]) {
 
 // MARK: - Recent
 
-struct Recent: ParsableCommand {
+struct Recent: AsyncParsableCommand {
 	static let configuration = CommandConfiguration(
 		abstract: "Show what you just did — commands from your current session."
 	)
@@ -103,13 +103,12 @@ struct Recent: ParsableCommand {
 	@Option(name: .shortAndLong, help: "Number of commands to show.")
 	var count: Int = 20
 
-	func run() throws {
+	func run() async throws {
 		let history = try loadHistory(options: shellOpts)
-		
-		embeddedUpdateCheck()
-		
 		let lines = HistoryParser(history: history).recent(count)
 		printLines(lines)
+		
+		await embeddedUpdateCheck()
 	}
 }
 
@@ -392,38 +391,31 @@ struct Version: ParsableCommand {
 
 // MARK: - Latest
 
-struct CheckUpdate: ParsableCommand {
+struct CheckUpdate: AsyncParsableCommand {
 	static let configuration = CommandConfiguration(
 		commandName: "check-update",
 		abstract: "Check if a newer version is available on GitHub."
 	)
 
-	mutating func run() throws {
+	mutating func run() async throws {
 		if #available(macOS 12.0, *) {
-			let sema = DispatchSemaphore(value: 0)
-			
-			Task {
-				defer { sema.signal() }
-				do {
-					let result = try await VersionChecker.checkForUpdate(
-						owner: Info.owner,
-						repo: Info.repo,
-						currentVersion: Info.currentVersion
-					)
-					
-					if result.updateAvailable {
-						print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
-					} else {
-						print("Up to date: \(result.currentVersion)")
-					}
-				} catch {
-					print("\(TerminalColor().red)Error checking for update: \(error) \(TerminalColor().reset)")
+			do {
+				let result = try await VersionChecker.checkForUpdate(
+					owner: Info.owner,
+					repo: Info.repo,
+					currentVersion: Info.currentVersion
+				)
+				
+				if result.updateAvailable {
+					print("Update available: \(result.latestVersion) (you have \(result.currentVersion))")
+				} else {
+					print("Up to date: \(result.currentVersion)")
 				}
+			} catch {
+				print("\(TerminalColor().red)Error checking for update: \(error)\(TerminalColor().reset)")
 			}
-			
-			sema.wait()
 		} else {
-			print("\(TerminalColor().red)check-update requires macOS 12.0 or newer. \(TerminalColor().reset)")
+			print(TerminalColor.applyColor(color: .red, to: "check-update is only available on macOS 12.0 or newer!"))
 		}
 	}
 }

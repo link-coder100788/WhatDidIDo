@@ -127,6 +127,7 @@ struct WhatDidIDoConfig {
 	var shouldColor: Bool = true
 	var updateAvailableWarning: Bool = true
 	var lastUpdateCheck: Date? = nil
+	var checkUpdateTimeout: Int = 15
 }
 
 struct WhatDidIDoConfigCodable: Encodable, Decodable {
@@ -134,13 +135,15 @@ struct WhatDidIDoConfigCodable: Encodable, Decodable {
 	var shouldColor: Bool
 	var updateAvailableWarning: Bool
 	var lastUpdateCheck: Date?
+	var checkUpdateTimeout: Int
 
 	static func from(config: WhatDidIDoConfig) -> WhatDidIDoConfigCodable {
 		return WhatDidIDoConfigCodable(
 			customPath: config.customPath,
 			shouldColor: config.shouldColor,
 			updateAvailableWarning: config.updateAvailableWarning,
-			lastUpdateCheck: config.lastUpdateCheck
+			lastUpdateCheck: config.lastUpdateCheck,
+			checkUpdateTimeout: config.checkUpdateTimeout,
 		)
 	}
 }
@@ -172,6 +175,7 @@ struct WhatDidIDoConfigCore {
 		WhatDidIDoConfig.shared.shouldColor = decoded.shouldColor
 		WhatDidIDoConfig.shared.updateAvailableWarning = decoded.updateAvailableWarning
 		WhatDidIDoConfig.shared.lastUpdateCheck = decoded.lastUpdateCheck
+		WhatDidIDoConfig.shared.checkUpdateTimeout = decoded.checkUpdateTimeout
 	}
 }
 

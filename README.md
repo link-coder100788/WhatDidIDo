@@ -19,7 +19,34 @@ whatdidido for git
 - Swift 5.9+
 - [swift-argument-parser](https://github.com/apple/swift-argument-parser) 1.3.0+
 
-### Make (recommended)
+### Homebrew (recommended)
+
+```bash
+brew tap link-coder100788/whatdidido
+brew install whatdidido
+```
+
+Or in a single command:
+
+```bash
+brew install link-coder100788/whatdidido/whatdidido
+```
+
+To update:
+
+```bash
+brew update
+brew upgrade whatdidido
+```
+
+To uninstall:
+
+```bash
+brew uninstall whatdidido
+brew untap link-coder100788/whatdidido
+```
+
+### Make
 
 ```bash
 git clone https://github.com/link-coder100788/WhatDidIDo
@@ -75,10 +102,6 @@ Shell and OS are **auto-detected** from your environment — you rarely need to 
 ---
 
 ## Commands
-
-<!-- 📸 SCREENSHOT: `whatdidido --help` or a composite showing 2–3 commands side by side.
-     Good as a quick reference image here, just above the command table.
-     Keep it tighter than the hero shot — ~860×300px works well. -->
 
 ### `recent` — What did I just do?
 

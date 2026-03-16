@@ -245,6 +245,16 @@ struct Summary: ParsableCommand {
 	func run() throws {
 		let history = try loadHistory(options: shellOpts)
 		let lines = HistoryParser(history: history).summary(last: last)
+
+		if WhatDidIDoConfig.shared.summaryDate {
+			var dateFormatter = DateFormatter()
+			
+			dateFormatter.locale = WhatDidIDoConfig.shared.locale
+			dateFormatter.setLocalizedDateFormatFromTemplate("MMMMdYYYY")
+		
+			print("Summary of last \(last) lines on \(dateFormatter.string(from: Date()))")
+		}
+		
 		printLines(lines)
 	}
 }
@@ -324,6 +334,12 @@ struct ConfigSet: ParsableCommand {
 	
 	@Option(name: .long, help: "Enable warnings regarding if there is an available update.")
 	var updateWarn: Bool?
+	
+	@Option(name: .long, help: "Locale used for summary date.")
+	var locale: String?
+	
+	@Option(name: .long, help: "Should summary print date recap.")
+	var summaryDate: Bool?
 
 	func run() throws {
 		WhatDidIDoConfigCore().load()
@@ -342,9 +358,23 @@ struct ConfigSet: ParsableCommand {
 			WhatDidIDoConfig.shared.updateAvailableWarning = updateWarn
 			print("✔ Update warning set to: \(updateWarn)")
 		}
+		
+		if let locale = locale {
+			WhatDidIDoConfig.shared.locale = Locale(identifier: locale)
+			print("✔ Locale set to: \(locale)")
+		}
+		
+		if let summaryDate = summaryDate {
+			WhatDidIDoConfig.shared.summaryDate = summaryDate
+			print("✔ Summary Date set to: \(summaryDate)")
+		}
 
-		if path == nil && color == nil && updateWarn == nil {
-			print("Nothing to set. Use --path, --color, or --updateWarn")
+		if path == nil,
+		   color == nil,
+		   updateWarn == nil,
+		   locale == nil,
+		   summaryDate == nil {
+			print("Nothing to set. Use --path, --color, --updateWarn, --locale, or --summaryDate")
 			return
 		}
 
@@ -364,6 +394,8 @@ struct ConfigShow: ParsableCommand {
 		print("color: \(cfg.shouldColor)")
 		print("path: \(cfg.customPath?.path ?? "(default — auto-detected from shell)")")
 		print("updateReminders: \(cfg.updateAvailableWarning)")
+		print("locale: \(cfg.locale)")
+		print("summaryDate: \(cfg.summaryDate)")
 	}
 }
 
@@ -376,6 +408,8 @@ struct ConfigReset: ParsableCommand {
 	func run() throws {
 		WhatDidIDoConfig.shared.customPath = nil
 		WhatDidIDoConfig.shared.shouldColor = true
+		WhatDidIDoConfig.shared.locale = Locale.current
+		WhatDidIDoConfig.shared.summaryDate = true
 		WhatDidIDoConfigCore().save()
 		print("✔ Configuration reset to defaults.")
 	}

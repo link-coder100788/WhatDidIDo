@@ -3,7 +3,7 @@ import Foundation
 enum Info {
 	static let owner = "link-coder100788"
 	static let repo = "WhatDidIDo"
-	static let currentVersion = "1.3.7"
+	static let currentVersion = "1.3.8"
 }
 
 enum Shell {
@@ -120,6 +120,8 @@ struct HistoryReader {
 	}
 }
 
+// MARK: - Config
+
 struct WhatDidIDoConfig {
 	nonisolated(unsafe) static var shared = WhatDidIDoConfig()
 
@@ -128,6 +130,8 @@ struct WhatDidIDoConfig {
 	var updateAvailableWarning: Bool = true
 	var lastUpdateCheck: Date? = nil
 	var checkUpdateTimeout: Int = 15
+	var locale: Locale = Locale.current
+	var summaryDate: Bool = true
 }
 
 struct WhatDidIDoConfigCodable: Encodable, Decodable {
@@ -136,6 +140,8 @@ struct WhatDidIDoConfigCodable: Encodable, Decodable {
 	var updateAvailableWarning: Bool
 	var lastUpdateCheck: Date?
 	var checkUpdateTimeout: Int
+	var locale: Locale
+	var summaryDate: Bool
 
 	static func from(config: WhatDidIDoConfig) -> WhatDidIDoConfigCodable {
 		return WhatDidIDoConfigCodable(
@@ -144,6 +150,8 @@ struct WhatDidIDoConfigCodable: Encodable, Decodable {
 			updateAvailableWarning: config.updateAvailableWarning,
 			lastUpdateCheck: config.lastUpdateCheck,
 			checkUpdateTimeout: config.checkUpdateTimeout,
+			locale: config.locale,
+			summaryDate: config.summaryDate,
 		)
 	}
 }
@@ -176,6 +184,8 @@ struct WhatDidIDoConfigCore {
 		WhatDidIDoConfig.shared.updateAvailableWarning = decoded.updateAvailableWarning
 		WhatDidIDoConfig.shared.lastUpdateCheck = decoded.lastUpdateCheck
 		WhatDidIDoConfig.shared.checkUpdateTimeout = decoded.checkUpdateTimeout
+		WhatDidIDoConfig.shared.locale = decoded.locale
+		WhatDidIDoConfig.shared.summaryDate = decoded.summaryDate
 	}
 }
 

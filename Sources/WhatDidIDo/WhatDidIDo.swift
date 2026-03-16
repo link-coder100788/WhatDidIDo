@@ -450,7 +450,10 @@ struct CheckUpdate: ParsableCommand {
 			let result = sema.wait(timeout: .now() + Double(WhatDidIDoConfig.shared.checkUpdateTimeout))
 			
 			if result == .timedOut {
-				print(TerminalColor.applyColor(color: .red, to: "check-update timed out after \(WhatDidIDoConfig.shared.checkUpdateTimeout) seconds"))
+				print(TerminalColor.applyColor(
+					color: .red,
+					to: "check-update timed out after \(WhatDidIDoConfig.shared.checkUpdateTimeout) seconds"
+				))
 			}
 		} else {
 			print(TerminalColor.applyColor(color: .red, to: "check-update is only available on macOS 12.0 or newer!"))

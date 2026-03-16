@@ -3,7 +3,7 @@ import Foundation
 enum Info {
 	static let owner = "link-coder100788"
 	static let repo = "WhatDidIDo"
-	static let currentVersion = "1.3.5"
+	static let currentVersion = "1.3.6"
 }
 
 enum Shell {
@@ -232,6 +232,12 @@ struct TerminalColor {
 	}
 }
 
+extension String {
+	func color(_ color: TerminalColor.Color) -> String {
+		return TerminalColor.applyColor(color: color, to: self)
+	}
+}
+
 struct HistoryParser {
 	let history: History
 	
@@ -340,6 +346,10 @@ struct HistoryParser {
 }
 
 // MARK: - Latest Version Helper
+
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
 
 struct UpdateResult {
 	let currentVersion: String

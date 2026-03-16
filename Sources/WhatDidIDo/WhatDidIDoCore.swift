@@ -3,7 +3,7 @@ import Foundation
 enum Info {
 	static let owner = "link-coder100788"
 	static let repo = "WhatDidIDo"
-	static let currentVersion = "1.3.4"
+	static let currentVersion = "1.3.5"
 }
 
 enum Shell {

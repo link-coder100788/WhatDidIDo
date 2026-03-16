@@ -38,7 +38,7 @@ struct WhatDidIDo: ParsableCommand {
 		if #available(macOS 10.15, *) {
 			let sema = DispatchSemaphore(value: 0)
 			Task {
-				await embeddedUpdateCheck()
+				await Helper.embeddedUpdateCheck()
 				sema.signal()
 			}
 			sema.wait()
@@ -130,7 +130,7 @@ struct Recent: ParsableCommand {
 		if #available(macOS 10.15, *) {
 			let sema = DispatchSemaphore(value: 0)
 			Task {
-				await embeddedUpdateCheck()
+				await Helper.embeddedUpdateCheck()
 				sema.signal()
 			}
 			sema.wait()
@@ -316,7 +316,12 @@ struct After: ParsableCommand {
 struct Config: ParsableCommand {
 	static let configuration = CommandConfiguration(
 		abstract: "View or update your whatdidido configuration.",
-		subcommands: [ConfigSet.self, ConfigShow.self, ConfigReset.self]
+		subcommands: [
+			ConfigSet.self,
+			ConfigShow.self,
+			ConfigReset.self,
+			ConfigOpen.self,
+		]
 	)
 }
 
@@ -412,6 +417,17 @@ struct ConfigReset: ParsableCommand {
 		WhatDidIDoConfig.shared.summaryDate = true
 		WhatDidIDoConfigCore().save()
 		print("✔ Configuration reset to defaults.")
+	}
+}
+
+struct ConfigOpen: ParsableCommand {
+	static let configuration = CommandConfiguration(
+		commandName: "open-config",
+		abstract: "Open the config file's folder"
+	)
+	
+	func run() throws {
+		try Helper.openConfigFolder(at: WhatDidIDoConfigCore().configURL)
 	}
 }
 

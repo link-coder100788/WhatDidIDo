@@ -2,7 +2,7 @@ PREFIX ?= /usr/local
 BINARY  = whatdidido
 BUILD   = .build/release/$(BINARY)
 
-.PHONY: all build release install uninstall clean test
+.PHONY: all build release install uninstall clean test debug
 
 # ── Default ────────────────────────────────────────────────
 all: build
@@ -33,3 +33,7 @@ clean:
 # ── Run tests (add XCTest targets to Package.swift first) ─
 test:
 	swift test
+
+debug:
+	swift build
+	./.build/debug/WhatDidIDo debug

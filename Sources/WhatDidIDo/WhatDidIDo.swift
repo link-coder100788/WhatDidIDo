@@ -22,6 +22,8 @@ struct WhatDidIDo: ParsableCommand {
 			Debug.self,
 			Version.self,
 			CheckUpdate.self,
+			Completion.self,
+			AISummary.self,
 		]
 	)
 	
@@ -445,11 +447,13 @@ struct Debug: ParsableCommand {
 		let shell = try shellOpts.resolvedShell()
 		let os = try shellOpts.resolvedOS()
 		let historyURL = WhatDidIDoConfig.shared.customPath ?? shell.getDefaultDirectory(in: os)
+		let locale = WhatDidIDoConfig.shared.locale
 
 		print("shell: \(shell.toString())")
 		print("os: \(os.toString())")
 		print("history: \(historyURL.path)")
 		print("color: \(WhatDidIDoConfig.shared.shouldColor)")
+		print("locale: \(locale)")
 	}
 }
 
@@ -508,5 +512,79 @@ struct CheckUpdate: ParsableCommand {
 		} else {
 			print(TerminalColor.applyColor(color: .red, to: "check-update is only available on macOS 12.0 or newer!"))
 		}
+	}
+}
+
+// MARK: - Completion
+
+struct Completion: ParsableCommand {
+	static let configuration = CommandConfiguration(
+		abstract: "Generate command completions."
+	)
+	
+	@Argument(help: "The shell to generate completions for (zsh, bash, fish).")
+	var shell: String
+	
+	func run() throws {
+		let script: String
+		
+		switch shell.lowercased() {
+		case "zsh":
+			script = WhatDidIDo.completionScript(for: .zsh)
+		case "bash":
+			script = WhatDidIDo.completionScript(for: .bash)
+		case "fish":
+			script = WhatDidIDo.completionScript(for: .fish)
+		default:
+			print("Not a valid shell: \(shell)".withColor(.red))
+			return
+		}
+		
+		print(script)
+	}
+}
+
+// MARK: - AI Features
+
+struct AISummary: ParsableCommand {
+	static let configuration = CommandConfiguration(
+		commandName: "ai-summary",
+		abstract: "Create an AI summary of your command summary."
+	)
+	
+	@OptionGroup var shellOpts: ShellOptions
+	
+	@Option(name: .shortAndLong, help: "How many recent commands to include for summary")
+	var last: Int = 50
+	
+	func run() throws {
+		#if os(macOS)
+		
+		if #available(macOS 26.0, *) {
+			let sema = DispatchSemaphore(value: 0)
+			
+			Task {
+				let history = try loadHistory(options: shellOpts)
+				let lines = HistoryParser(history: history).summary(last: last)
+				
+				let core = SummarizedSummaryCore()
+				
+				let result = await core.generate(for: lines)
+				
+				print("Result")
+				
+				sema.signal()
+			}
+			
+			sema.wait()
+		} else {
+			print("AI summarization is only available on macOS 26.0 or newer")
+		}
+		
+		#else
+		
+		print("AI summarization is only available on macOS.")
+		
+		#endif
 	}
 }

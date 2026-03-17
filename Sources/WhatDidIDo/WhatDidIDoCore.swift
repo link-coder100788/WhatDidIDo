@@ -3,7 +3,7 @@ import Foundation
 enum Info {
 	static let owner = "link-coder100788"
 	static let repo = "WhatDidIDo"
-	static let currentVersion = "1.4.0"
+	static let currentVersion = "1.5.0"
 }
 
 enum Shell {
@@ -189,6 +189,8 @@ struct WhatDidIDoConfigCore {
 	}
 }
 
+typealias CFG = WhatDidIDoConfig
+
 // MARK: - Color Helpers
 
 struct TerminalColor {
@@ -244,6 +246,10 @@ struct TerminalColor {
 
 extension String {
 	func color(_ color: TerminalColor.Color) -> String {
+		return TerminalColor.applyColor(color: color, to: self)
+	}
+	
+	func withColor(_ color: TerminalColor.Color) -> String {
 		return TerminalColor.applyColor(color: color, to: self)
 	}
 }

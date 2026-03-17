@@ -3,7 +3,7 @@ import Foundation
 enum Info {
 	static let owner = "link-coder100788"
 	static let repo = "WhatDidIDo"
-	static let currentVersion = "1.5.3"
+	static let currentVersion = "1.5.4"
 }
 
 enum Shell {
@@ -458,6 +458,8 @@ struct VersionChecker {
 		)
 	}
 }
+
+// MARK: - Helper
 
 struct Helper {
 	static func embeddedUpdateCheck() async {

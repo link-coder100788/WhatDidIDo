@@ -249,7 +249,7 @@ struct Summary: ParsableCommand {
 		let lines = HistoryParser(history: history).summary(last: last)
 
 		if WhatDidIDoConfig.shared.summaryDate {
-			var dateFormatter = DateFormatter()
+			let dateFormatter = DateFormatter()
 			
 			dateFormatter.locale = WhatDidIDoConfig.shared.locale
 			dateFormatter.setLocalizedDateFormatFromTemplate("MMMMdYYYY")
@@ -571,7 +571,7 @@ struct AISummary: ParsableCommand {
 				
 				let result = await core.generate(for: lines)
 				
-				print("Result")
+				print(result ?? "Error")
 				
 				sema.signal()
 			}

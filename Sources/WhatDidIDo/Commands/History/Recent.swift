@@ -1,35 +1,16 @@
-import ArgumentParser
 import Foundation
+import ArgumentParser
 
-@main
-struct WhatDidIDo: ParsableCommand {
+struct Recent: ParsableCommand {
 	static let configuration = CommandConfiguration(
-		commandName: "whatdidido",
-		abstract: "A pretty wrapper for your shell history.",
-		usage: "whatdidido <command> [options]",
-		subcommands: [
-			Recent.self,
-			Dirs.self,
-			Top.self,
-			Search.self,
-			For.self,
-			Summary.self,
-			Check.self,
-			After.self,
-			Config.self,
-			Debug.self,
-			Version.self,
-			CheckUpdate.self,
-			Completion.self,
-			AICommand.self,
-		]
+		abstract: "Show what you just did — commands from your current session."
 	)
 	
 	@OptionGroup var shellOpts: ShellOptions
 	
 	@Option(name: .shortAndLong, help: "Number of commands to show.")
 	var count: Int = 20
-
+	
 	func run() throws {
 		let history = try loadHistory(options: shellOpts)
 		let lines = HistoryParser(history: history).recent(count)

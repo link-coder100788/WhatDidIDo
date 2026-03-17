@@ -1,8 +1,7 @@
 import Foundation
 
-#if canImport(FoundationModels)
+#if os(macOS)
 import FoundationModels
-#endif
 
 @available(macOS 26.0, *)
 @Generable
@@ -46,3 +45,5 @@ struct SummarizedSummaryCore {
 		return nil
 	}
 }
+
+#endif

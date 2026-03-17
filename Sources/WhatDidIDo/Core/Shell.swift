@@ -1,32 +1,10 @@
 import Foundation
 
-enum Info {
-	static let owner = "link-coder100788"
-	static let repo = "WhatDidIDo"
-	static let currentVersion = "1.5.4"
-}
-
 enum Shell {
 	case zsh
 	case bash
 	case fish
 	case powershell
-}
-
-enum OperatingSystem {
-	case macOS
-	case linux
-	case windows
-}
-
-extension OperatingSystem {
-	func toString() -> String {
-		switch self {
-		case .linux: return "Linux"
-		case .macOS: return "MacOS"
-		case .windows: return "Windows"
-		}
-	}
 }
 
 extension Shell {
@@ -58,3 +36,4 @@ extension Shell {
 		}
 	}
 }
+

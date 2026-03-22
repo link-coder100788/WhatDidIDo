@@ -16,12 +16,17 @@ struct Debug: ParsableCommand {
 		let os = try shellOpts.resolvedOS()
 		let historyURL = WhatDidIDoConfig.shared.customPath ?? shell.getDefaultDirectory(in: os)
 		let locale = WhatDidIDoConfig.shared.locale
+		var lastUpdateString = "Never"
+		if let lastUpdate = WhatDidIDoConfig.shared.lastUpdateCheck {
+			lastUpdateString = lastUpdate.debugDescription
+		}
 
 		print("shell: \(shell.toString())")
 		print("os: \(os.toString())")
 		print("history: \(historyURL.path)")
 		print("color: \(WhatDidIDoConfig.shared.shouldColor)")
 		print("locale: \(locale)")
+		print("lastUpdateCheck: \(lastUpdateString)")
 	}
 }
 

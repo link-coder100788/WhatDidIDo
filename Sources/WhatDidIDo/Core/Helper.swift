@@ -1,6 +1,21 @@
 import Foundation
 
+/// Miscellaneous utility functions used across command implementations.
 struct Helper {
+	/// Silently checks for a newer release in the background and prints a one-line reminder
+	/// if one is available.
+	///
+	/// The check is skipped entirely when:
+	/// - ``WhatDidIDoConfig/updateAvailableWarning`` is `false`.
+	/// - A check was already performed within the last 24 hours
+	///   (``WhatDidIDoConfig/lastUpdateCheck`` is set and recent).
+	///
+	/// On success the ``WhatDidIDoConfig/lastUpdateCheck`` timestamp is updated and the
+	/// config is saved to disk. Network or parsing errors are swallowed silently so that
+	/// a failed check never interrupts normal command output.
+	///
+	/// - Note: Requires macOS 12.0 or later for `async/await` URLSession support.
+	///   On older systems the call is a no-op.
 	static func embeddedUpdateCheck() async {
 		guard WhatDidIDoConfig.shared.updateAvailableWarning else { return }
 
@@ -29,7 +44,16 @@ struct Helper {
 				} catch { }
 		 }
 	}
-	
+
+	/// Opens the folder containing the `whatdidido` config file in the system file manager.
+	///
+	/// The platform-appropriate command is used:
+	/// - **macOS**: `/usr/bin/open <folder>`
+	/// - **Linux**: `/usr/bin/xdg-open <folder>` (requires `xdg-utils` to be installed)
+	/// - **Windows**: `cmd /c start "" <folder>`
+	///
+	/// - Parameter url: The URL of the config *file* whose parent directory should be opened.
+	/// - Throws: Any error thrown by ``Process/run()`` if the helper binary cannot be launched.
 	static func openConfigFolder(at url: URL) throws {
 		let folderPath = url.deletingLastPathComponent().path
 		
@@ -50,4 +74,3 @@ struct Helper {
 		try ps.run()
 	}
 }
-

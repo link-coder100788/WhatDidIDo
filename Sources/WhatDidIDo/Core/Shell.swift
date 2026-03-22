@@ -1,13 +1,33 @@
 import Foundation
 
+// MARK: - Shell
+
+/// The supported interactive shells that `whatdidido` can read history from.
 enum Shell {
+	/// Z shell — history stored in `~/.zsh_history`, optionally with extended timestamp metadata.
 	case zsh
+	/// Bourne-Again shell — history stored in `~/.bash_history`.
 	case bash
+	/// Fish shell — history stored in `~/.local/share/fish/fish_history` as YAML.
 	case fish
+	/// PowerShell — history stored at a platform-specific `PSReadLine` path.
 	case powershell
 }
 
 extension Shell {
+	/// Returns the default history file URL for this shell on the given operating system.
+	///
+	/// When ``WhatDidIDoConfig/customPath`` is set, callers should use that value instead.
+	///
+	/// | Shell       | macOS                                                              | Linux                                               | Windows                                                        |
+	/// |-------------|--------------------------------------------------------------------|-----------------------------------------------------|----------------------------------------------------------------|
+	/// | zsh         | `~/.zsh_history`                                                   | `~/.zsh_history`                                    | n/a                                                            |
+	/// | bash        | `~/.bash_history`                                                  | `~/.bash_history`                                   | n/a                                                            |
+	/// | fish        | `~/.local/share/fish/fish_history`                                 | `~/.local/share/fish/fish_history`                  | n/a                                                            |
+	/// | powershell  | `~/Library/Application Support/PowerShell/PSReadLine/…`           | `~/.local/share/powershell/PSReadLine/…`            | `~/AppData/Roaming/Microsoft/Windows/PowerShell/PSReadLine/…` |
+	///
+	/// - Parameter os: The operating system to resolve the path for.
+	/// - Returns: The `URL` of the default history file.
 	func getDefaultDirectory(in os: OperatingSystem) -> URL {
 		let home = FileManager.default.homeDirectoryForCurrentUser
 
@@ -27,13 +47,13 @@ extension Shell {
 		}
 	}
 
+	/// A human-readable display name for this shell (e.g. `"zsh"`, `"Bash"`).
 	func toString() -> String {
 		switch self {
-		case .bash: return "Bash"
-		case .fish: return "Fish"
+		case .bash:       return "Bash"
+		case .fish:       return "Fish"
 		case .powershell: return "PowerShell"
-		case .zsh: return "zsh"
+		case .zsh:        return "zsh"
 		}
 	}
 }
-

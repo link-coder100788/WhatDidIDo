@@ -4,17 +4,37 @@ import Foundation
 import FoundationNetworking
 #endif
 
+// MARK: - UpdateResult
+
+/// The outcome of a version check against the GitHub Releases API.
 struct UpdateResult {
+	/// The version string of the locally installed binary (e.g. `"1.5.6"`).
 	let currentVersion: String
+
+	/// The tag name of the latest GitHub release (e.g. `"v1.6.0"`).
 	let latestVersion: String
+
+	/// `true` when ``latestVersion`` is semantically newer than ``currentVersion``.
 	let updateAvailable: Bool
 }
 
+// MARK: - VersionError
+
+/// Errors that can be thrown during a version-check network request.
 enum VersionError: Error, CustomStringConvertible {
+	/// The server returned a non-200 HTTP status code.
 	case networkError(statusCode: Int)
+
+	/// The GitHub API response could not be parsed as expected JSON.
 	case parseError
+
+	/// A version string contained non-numeric components and could not be compared.
 	case invalidVersion(String)
+
+	/// The device has no internet connection.
 	case noNetwork
+
+	/// The network request exceeded its time budget.
 	case timedOut
 
 	var description: String {
@@ -28,9 +48,20 @@ enum VersionError: Error, CustomStringConvertible {
 	}
 }
 
-// MARK: - Version Logic
+// MARK: - VersionChecker
 
+/// Compares semantic version strings and queries the GitHub Releases API for the latest release.
 struct VersionChecker {
+	/// Returns `true` when `latest` is a higher semantic version than `current`.
+	///
+	/// Both strings are normalised by stripping a leading `"v"` and splitting on `"."`.
+	/// Each numeric component is compared in order; missing trailing components are treated
+	/// as `0` (so `"1.2"` == `"1.2.0"`).
+	///
+	/// - Parameters:
+	///   - latest: The candidate version to test (e.g. `"v1.6.0"`).
+	///   - current: The baseline version to compare against (e.g. `"1.5.6"`).
+	/// - Returns: `true` if `latest` is strictly greater than `current`.
 	static func isNewerVersion(_ latest: String, than current: String) -> Bool {
 		let clean = { (v: String) in
 			v.trimmingCharacters(in: .init(charactersIn: "v"))
@@ -49,6 +80,17 @@ struct VersionChecker {
 		return false
 	}
 
+	/// Fetches the tag name of the latest release from GitHub for the given repository.
+	///
+	/// Uses the GitHub REST API endpoint `GET /repos/{owner}/{repo}/releases/latest`.
+	/// An optional `token` can be supplied for private repositories or to avoid rate limiting.
+	///
+	/// - Parameters:
+	///   - owner: The GitHub repository owner (username or organisation).
+	///   - repo: The repository name.
+	///   - token: An optional personal access token sent as a `Bearer` authorisation header.
+	/// - Returns: The `tag_name` string from the latest release.
+	/// - Throws: A ``VersionError`` describing the failure.
 	@available(macOS 12.0, *)
 	static func fetchLatestVersion(owner: String, repo: String, token: String? = nil) async throws -> String {
 		let url = URL(string: "https://api.github.com/repos/\(owner)/\(repo)/releases/latest")!
@@ -85,6 +127,18 @@ struct VersionChecker {
 		return tag
 	}
 
+	/// Checks whether a newer release is available on GitHub and returns an ``UpdateResult``.
+	///
+	/// Convenience wrapper around ``fetchLatestVersion(owner:repo:token:)`` and
+	/// ``isNewerVersion(_:than:)``.
+	///
+	/// - Parameters:
+	///   - owner: The GitHub repository owner.
+	///   - repo: The repository name.
+	///   - currentVersion: The version string of the installed binary to compare against.
+	///   - token: An optional personal access token.
+	/// - Returns: An ``UpdateResult`` describing the comparison outcome.
+	/// - Throws: A ``VersionError`` if the network request or parsing fails.
 	@available(macOS 12.0, *)
 	static func checkForUpdate(owner: String, repo: String, currentVersion: String, token: String? = nil) async throws -> UpdateResult {
 		let latest = try await fetchLatestVersion(owner: owner, repo: repo, token: token)
@@ -95,4 +149,3 @@ struct VersionChecker {
 		)
 	}
 }
-

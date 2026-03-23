@@ -279,15 +279,4 @@ struct HistoryParser {
 		let end = min(history.content.index(start, offsetBy: window), history.content.endIndex)
 		return Array(history.content[start..<end]).map { "\(color.blue)▸\(color.reset) \($0)" }
 	}
-	
-	/// Evaluates custom logic against the raw history, returning the result as formatted strings.
-	///
-	/// Use this as an escape hatch when the built-in methods don't cover your use case.
-	///
-	/// - Parameter predicate: A closure that receives the raw ``History`` and returns
-	///   an array of formatted output strings.
-	/// - Returns: Whatever the closure returns.
-	func query(where predicate: (History) -> [String]) -> [String] {
-		return predicate(self.history)
-	}
 }

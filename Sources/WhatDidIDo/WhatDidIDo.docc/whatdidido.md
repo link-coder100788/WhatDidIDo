@@ -26,3 +26,7 @@ Shell and OS are auto-detected from your environment — you rarely need to pass
 
 - <doc:Configuration>
 - <doc:ShellSupport>
+
+### Extending
+
+- <doc:ExtendingWhatDidIDo>

@@ -1,4 +1,4 @@
-# ``WhatDidIDo``
+# ``whatdidido``
 
 A pretty wrapper for your shell history. Answers the questions you actually ask yourself at the terminal.
 

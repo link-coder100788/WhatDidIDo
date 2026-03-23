@@ -7,7 +7,7 @@ import ArgumentParser
 ///
 /// Both options default to auto-detected values and rarely need to be supplied manually.
 /// Include this group with `@OptionGroup var shellOpts: ShellOptions` in any
-/// ``ParsableCommand`` that needs to read the history file.
+/// `ParsableCommand` that needs to read the history file.
 struct ShellOptions: ParsableArguments {
 	/// The shell to read history from.
 	///
@@ -25,7 +25,7 @@ struct ShellOptions: ParsableArguments {
 
 	/// Converts the raw `--shell` string into a typed ``Shell`` value.
 	///
-	/// - Throws: ``ArgumentParser/ValidationError`` if the string is not a recognised shell name.
+	/// - Throws: `ArgumentParser/ValidationError` if the string is not a recognised shell name.
 	func resolvedShell() throws -> Shell {
 		switch shell.lowercased() {
 		case "zsh":        return .zsh
@@ -39,7 +39,7 @@ struct ShellOptions: ParsableArguments {
 
 	/// Converts the raw `--os` string into a typed ``OperatingSystem`` value.
 	///
-	/// - Throws: ``ArgumentParser/ValidationError`` if the string is not a recognised OS name.
+	/// - Throws: `ArgumentParser/ValidationError` if the string is not a recognised OS name.
 	func resolvedOS() throws -> OperatingSystem {
 		switch os.lowercased() {
 		case "macos", "mac": return .macOS

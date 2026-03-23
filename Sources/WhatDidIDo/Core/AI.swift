@@ -6,7 +6,7 @@ import FoundationModels
 // MARK: - SummarizedSummaryCore
 
 /// Generates a natural-language summary of a pre-processed command summary using
-/// the on-device ``SystemLanguageModel``.
+/// the on-device `SystemLanguageModel`.
 ///
 /// Available on macOS 26.0 and later only. The model runs entirely on-device —
 /// no data is sent to external servers.
@@ -58,7 +58,7 @@ struct SummarizedSummaryCore {
 // MARK: - SummarizedHistoryCore
 
 /// Generates a natural-language summary of raw recent history lines using
-/// the on-device ``SystemLanguageModel``.
+/// the on-device `SystemLanguageModel`.
 ///
 /// Functionally identical to ``SummarizedSummaryCore`` but intended for use with
 /// unfiltered history output (i.e. the result of ``HistoryParser/recent(_:)`` rather

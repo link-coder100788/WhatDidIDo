@@ -26,7 +26,7 @@ func autoDetectOS() -> String {
 ///
 /// - Parameter options: The ``ShellOptions`` group that carries `--shell` and `--os` overrides.
 /// - Returns: A ``History`` value containing the parsed command lines.
-/// - Throws: ``ArgumentParser/ValidationError`` if the shell or OS string is unrecognised,
+/// - Throws: `ArgumentParser/ValidationError` if the shell or OS string is unrecognised,
 ///   or if the history file cannot be located or read.
 func loadHistory(options: ShellOptions) throws -> History {
 	WhatDidIDoConfigCore().load()

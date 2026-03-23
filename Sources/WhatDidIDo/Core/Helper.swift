@@ -53,7 +53,7 @@ struct Helper {
 	/// - **Windows**: `cmd /c start "" <folder>`
 	///
 	/// - Parameter url: The URL of the config *file* whose parent directory should be opened.
-	/// - Throws: Any error thrown by ``Process/run()`` if the helper binary cannot be launched.
+	/// - Throws: Any error thrown by `Process/run()` if the helper binary cannot be launched.
 	static func openConfigFolder(at url: URL) throws {
 		let folderPath = url.deletingLastPathComponent().path
 		

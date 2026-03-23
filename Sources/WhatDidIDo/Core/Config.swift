@@ -36,7 +36,7 @@ struct WhatDidIDoConfig {
 	var checkUpdateTimeout: Int = 15
 
 	/// The locale used to format dates in the `summary` command header. Defaults to
-	/// ``Locale/current``.
+	/// `Locale/current`.
 	var locale: Locale = Locale.current
 
 	/// Whether the `summary` command should print a date header. Defaults to `true`.

@@ -73,4 +73,12 @@ struct Helper {
 		
 		try ps.run()
 	}
+	
+	static func saveAndCreateMetadata() {
+		if !ProgramMetadata.exists() {
+			ProgramMetadata.save(ProgramMetadata.shared)
+		} else {
+			
+		}
+	}
 }

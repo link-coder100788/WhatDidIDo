@@ -9,5 +9,5 @@ enum Info {
 	static let repo = "WhatDidIDo"
 	
 	/// The version of the project
-	static let currentVersion = "1.5.8"
+	static let currentVersion = "1.6.1"
 }
